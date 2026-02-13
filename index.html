@@ -8,7 +8,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
         :root {
             --bg-primary: #0a0e1a;
@@ -407,98 +406,84 @@
     </div>
 
     <script>
-        // Bibliothèque NBT simplifiée pour navigateur (sans Buffer)
-        class NBTReader {
+        // Parser pour le format binaire Bloxd (Little-Endian)
+        class BloxdReader {
             constructor(uint8Array) {
                 this.data = uint8Array;
                 this.offset = 0;
+                this.view = new DataView(uint8Array.buffer);
+            }
+
+            readInt32() {
+                const val = this.view.getInt32(this.offset, true); // true = little-endian
+                this.offset += 4;
+                return val;
+            }
+
+            readUInt32() {
+                const val = this.view.getUint32(this.offset, true);
+                this.offset += 4;
+                return val;
+            }
+
+            readUInt16() {
+                const val = this.view.getUint16(this.offset, true);
+                this.offset += 2;
+                return val;
             }
 
             readByte() {
                 return this.data[this.offset++];
             }
 
-            readShort() {
-                const val = (this.data[this.offset] << 8) | this.data[this.offset + 1];
-                this.offset += 2;
-                return val > 32767 ? val - 65536 : val;
-            }
-
-            readInt() {
-                const val = (this.data[this.offset] << 24) | 
-                           (this.data[this.offset + 1] << 16) | 
-                           (this.data[this.offset + 2] << 8) | 
-                           this.data[this.offset + 3];
-                this.offset += 4;
-                return val;
-            }
-
             readString() {
-                const length = this.readShort();
+                const length = this.readInt32();
                 const bytes = this.data.slice(this.offset, this.offset + length);
                 this.offset += length;
                 return new TextDecoder('utf-8').decode(bytes);
             }
 
-            readCompound() {
-                const compound = {};
-                while (true) {
-                    const type = this.readByte();
-                    if (type === 0) break; // TAG_End
-                    const name = this.readString();
-                    compound[name] = this.readTag(type);
-                }
-                return compound;
-            }
-
-            readList() {
-                const type = this.readByte();
-                const length = this.readInt();
-                const list = [];
-                for (let i = 0; i < length; i++) {
-                    list.push(this.readTag(type));
-                }
-                return list;
-            }
-
-            readByteArray() {
-                const length = this.readInt();
-                const arr = Array.from(this.data.slice(this.offset, this.offset + length));
-                this.offset += length;
-                return arr;
-            }
-
-            readIntArray() {
-                const length = this.readInt();
-                const arr = [];
-                for (let i = 0; i < length; i++) {
-                    arr.push(this.readInt());
-                }
-                return arr;
-            }
-
-            readTag(type) {
-                switch (type) {
-                    case 1: return this.readByte();
-                    case 2: return this.readShort();
-                    case 3: return this.readInt();
-                    case 7: return this.readByteArray();
-                    case 8: return this.readString();
-                    case 9: return this.readList();
-                    case 10: return this.readCompound();
-                    case 11: return this.readIntArray();
-                    default: throw new Error(`Type NBT inconnu: ${type}`);
-                }
-            }
-
             parse() {
-                const type = this.readByte();
-                if (type !== 10) throw new Error('Le fichier doit commencer par un TAG_Compound');
-                const name = this.readString();
-                return this.readCompound();
+                const schematic = {};
+                
+                // Lire le nom
+                schematic.name = this.readString();
+                console.log('Nom:', schematic.name);
+                
+                // Lire les dimensions (probablement 3 uint16 ou int32)
+                schematic.width = this.readUInt16();
+                schematic.height = this.readUInt16();
+                schematic.length = this.readUInt16();
+                console.log('Dimensions:', schematic.width, 'x', schematic.height, 'x', schematic.length);
+                
+                // Lire le nombre de blocs dans la palette
+                const paletteSize = this.readUInt16();
+                console.log('Taille palette:', paletteSize);
+                
+                // Lire la palette
+                schematic.palette = {};
+                for (let i = 0; i < paletteSize; i++) {
+                    const blockName = this.readString();
+                    schematic.palette[i] = blockName;
+                    console.log(`Palette[${i}] =`, blockName);
+                }
+                
+                // Lire les données de blocs
+                const totalBlocks = schematic.width * schematic.height * schematic.length;
+                schematic.blockData = [];
+                
+                for (let i = 0; i < totalBlocks; i++) {
+                    const blockIndex = this.readUInt16();
+                    schematic.blockData.push(blockIndex);
+                }
+                
+                console.log('Blocs lus:', schematic.blockData.length);
+                
+                return schematic;
             }
         }
 
+        // Écrivain NBT pour Minecraft (Big-Endian)
         class NBTWriter {
             constructor() {
                 this.buffer = [];
@@ -535,50 +520,43 @@
                 }
             }
 
-            writeIntArray(arr) {
-                this.writeInt(arr.length);
-                for (const val of arr) {
-                    this.writeInt(val);
-                }
-            }
-
             writeCompound(obj) {
                 for (const [key, value] of Object.entries(obj)) {
                     if (value === null || value === undefined) continue;
                     
                     if (typeof value === 'number' && Number.isInteger(value)) {
                         if (value >= -128 && value <= 127) {
-                            this.writeByte(1); // TAG_Byte
+                            this.writeByte(1);
                             this.writeString(key);
                             this.writeByte(value);
                         } else if (value >= -32768 && value <= 32767) {
-                            this.writeByte(2); // TAG_Short
+                            this.writeByte(2);
                             this.writeString(key);
                             this.writeShort(value);
                         } else {
-                            this.writeByte(3); // TAG_Int
+                            this.writeByte(3);
                             this.writeString(key);
                             this.writeInt(value);
                         }
                     } else if (typeof value === 'string') {
-                        this.writeByte(8); // TAG_String
+                        this.writeByte(8);
                         this.writeString(key);
                         this.writeString(value);
                     } else if (Array.isArray(value)) {
-                        this.writeByte(7); // TAG_Byte_Array
+                        this.writeByte(7);
                         this.writeString(key);
                         this.writeByteArray(value);
                     } else if (typeof value === 'object') {
-                        this.writeByte(10); // TAG_Compound
+                        this.writeByte(10);
                         this.writeString(key);
                         this.writeCompound(value);
                     }
                 }
-                this.writeByte(0); // TAG_End
+                this.writeByte(0);
             }
 
             write(data, name = '') {
-                this.writeByte(10); // TAG_Compound
+                this.writeByte(10);
                 this.writeString(name);
                 this.writeCompound(data);
                 return new Uint8Array(this.buffer);
@@ -705,48 +683,16 @@
                 const arrayBuffer = await currentFile.arrayBuffer();
                 const uint8Array = new Uint8Array(arrayBuffer);
                 
-                console.log('Taille fichier:', uint8Array.length);
-                console.log('Premiers 20 bytes:', Array.from(uint8Array.slice(0, 20)));
-                console.log('Premiers bytes en hex:', Array.from(uint8Array.slice(0, 20)).map(b => b.toString(16).padStart(2, '0')).join(' '));
-                
                 progressFill.style.width = '40%';
                 
-                // Décompresser le fichier
-                let decompressed;
-                let wasCompressed = false;
-                try {
-                    decompressed = pako.ungzip(uint8Array);
-                    wasCompressed = true;
-                    console.log('Fichier décompressé! Nouvelle taille:', decompressed.length);
-                    console.log('Premiers 20 bytes décompressés:', Array.from(decompressed.slice(0, 20)));
-                } catch (e) {
-                    console.log('Fichier non compressé');
-                    decompressed = uint8Array;
-                }
-                
-                progressFill.style.width = '50%';
-                
-                // Vérifier si c'est du NBT ou du JSON
-                let nbtData;
-                try {
-                    // Essayer de parser comme JSON d'abord
-                    const text = new TextDecoder().decode(decompressed);
-                    console.log('Tentative de parsing JSON...');
-                    console.log('Premiers 200 caractères:', text.substring(0, 200));
-                    nbtData = JSON.parse(text);
-                    console.log('C\'est du JSON!', nbtData);
-                } catch (jsonError) {
-                    console.log('Pas du JSON, tentative NBT...');
-                    // Si pas JSON, essayer NBT
-                    const reader = new NBTReader(decompressed);
-                    nbtData = reader.parse();
-                    console.log('Données NBT:', nbtData);
-                }
+                // Parser le format Bloxd
+                const reader = new BloxdReader(uint8Array);
+                const bloxdData = reader.parse();
                 
                 progressFill.style.width = '60%';
                 
                 // Convertir en format Minecraft
-                const minecraftSchem = convertToMinecraft(nbtData);
+                const minecraftSchem = convertToMinecraft(bloxdData);
                 
                 progressFill.style.width = '80%';
                 
@@ -779,32 +725,19 @@
         });
         
         function convertToMinecraft(bloxdData) {
-            const width = bloxdData.Width || bloxdData.width || 16;
-            const height = bloxdData.Height || bloxdData.height || 16;
-            const length = bloxdData.Length || bloxdData.length || 16;
-            
             const palette = {};
             const blockData = [];
             let paletteMax = 0;
             
-            // Récupérer les blocs
-            const blocks = bloxdData.BlockData || bloxdData.Blocks || bloxdData.blocks || [];
-            const bloxdPalette = bloxdData.Palette || bloxdData.palette || {};
-            
-            // Créer la palette inversée
-            const inversePalette = {};
-            for (const [blockName, index] of Object.entries(bloxdPalette)) {
-                inversePalette[index] = blockName;
-            }
-            
             // Convertir les blocs
-            for (let i = 0; i < width * height * length; i++) {
-                let blockIndex = blocks[i] || 0;
-                let bloxdBlockName = inversePalette[blockIndex] || 'air';
+            for (let i = 0; i < bloxdData.blockData.length; i++) {
+                const blockIndex = bloxdData.blockData[i];
+                let bloxdBlockName = bloxdData.palette[blockIndex] || 'air';
                 
                 // Nettoyer le nom du bloc
                 bloxdBlockName = bloxdBlockName.toLowerCase()
                     .replace(/^minecraft:/, '')
+                    .replace(/^bloxd:/, '')
                     .replace(/[^a-z_]/g, '_');
                 
                 // Convertir vers Minecraft
@@ -821,9 +754,9 @@
             return {
                 Version: 2,
                 DataVersion: 2730,
-                Width: width,
-                Height: height,
-                Length: length,
+                Width: bloxdData.width,
+                Height: bloxdData.height,
+                Length: bloxdData.length,
                 Palette: palette,
                 PaletteMax: paletteMax,
                 BlockData: blockData
@@ -831,7 +764,6 @@
         }
         
         function createSchemFile(schem) {
-            // Créer la structure NBT pour Sponge Schematic v2
             const paletteObj = {};
             for (const [block, index] of Object.entries(schem.Palette)) {
                 paletteObj[block] = index;
@@ -851,7 +783,6 @@
             const writer = new NBTWriter();
             const nbtBytes = writer.write(nbtData, 'Schematic');
             
-            // Compresser avec gzip
             return pako.gzip(nbtBytes);
         }
     </script>
