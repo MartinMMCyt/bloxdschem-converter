@@ -1,5 +1,7 @@
+<!-- Made by Cazozozop and Martin_MMC -->
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +10,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
+
+    <!-- css -->
     <style>
         :root {
             --bg-primary: #0a0e1a;
@@ -21,13 +25,13 @@
             --border-color: rgba(0, 255, 204, 0.2);
             --shadow-glow: 0 0 40px rgba(0, 255, 204, 0.15);
         }
-        
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: 'JetBrains Mono', monospace;
             background: var(--bg-primary);
@@ -36,7 +40,7 @@
             overflow-x: hidden;
             position: relative;
         }
-        
+
         body::before {
             content: '';
             position: fixed;
@@ -44,19 +48,27 @@
             height: 200%;
             top: -50%;
             left: -50%;
-            background: 
-                radial-gradient(circle at 20% 30%, rgba(179, 102, 255, 0.08) 0%, transparent 50%),
-                radial-gradient(circle at 80% 70%, rgba(0, 255, 204, 0.08) 0%, transparent 50%);
+            background: radial-gradient(circle at 20% 30%, rgba(179, 102, 255, 0.08)0%, transparent 50%), radial-gradient(circle at 80% 70%, rgba(0, 255, 204, 0.08)0%, transparent 50%);
             animation: drift 20s ease-in-out infinite;
             pointer-events: none;
         }
-        
+
         @keyframes drift {
-            0%, 100% { transform: translate(0, 0) rotate(0deg); }
-            33% { transform: translate(-3%, 3%) rotate(1deg); }
-            66% { transform: translate(3%, -3%) rotate(-1deg); }
+
+            0%,
+            100% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+
+            33% {
+                transform: translate(-3%, 3%) rotate(1deg);
+            }
+
+            66% {
+                transform: translate(3%, -3%) rotate(-1deg);
+            }
         }
-        
+
         .container {
             max-width: 900px;
             margin: 0 auto;
@@ -64,24 +76,25 @@
             position: relative;
             z-index: 1;
         }
-        
+
         header {
             text-align: center;
             margin-bottom: 60px;
             animation: fadeInDown 0.8s ease;
         }
-        
+
         @keyframes fadeInDown {
             from {
                 opacity: 0;
                 transform: translateY(-30px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
             }
         }
-        
+
         h1 {
             font-family: 'Orbitron', sans-serif;
             font-size: clamp(2rem, 5vw, 3.5rem);
@@ -94,25 +107,25 @@
             letter-spacing: -0.02em;
             line-height: 1.1;
         }
-        
+
         .subtitle {
-            font-size: 0.95rem;
+            font-size: .95rem;
             color: var(--text-secondary);
-            letter-spacing: 0.05em;
+            letter-spacing: .05em;
             text-transform: uppercase;
         }
-        
+
         .converter-card {
             background: var(--bg-secondary);
             border-radius: 24px;
             padding: 48px;
             border: 1px solid var(--border-color);
             box-shadow: var(--shadow-glow);
-            animation: fadeInUp 0.8s ease 0.2s both;
+            animation: fadeInUp .8s ease .2s both;
             position: relative;
             overflow: hidden;
         }
-        
+
         .converter-card::before {
             content: '';
             position: absolute;
@@ -124,68 +137,74 @@
             background-size: 200% 100%;
             animation: shimmer 3s linear infinite;
         }
-        
+
         @keyframes shimmer {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
+            0% {
+                background-position: 200% 0;
+            }
+
+            100% {
+                background-position: -200% 0;
+            }
         }
-        
+
         @keyframes fadeInUp {
             from {
                 opacity: 0;
                 transform: translateY(30px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
             }
         }
-        
+
         .drop-zone {
             border: 2px dashed var(--border-color);
             border-radius: 16px;
             padding: 60px 32px;
             text-align: center;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all .3s cubic-bezier(.4, 0, .2, 1);
             background: var(--bg-tertiary);
             position: relative;
             cursor: pointer;
         }
-        
+
         .drop-zone:hover {
             border-color: var(--accent-cyan);
-            background: rgba(0, 255, 204, 0.05);
+            background: rgba(0, 255, 204, .05);
             transform: translateY(-2px);
         }
-        
+
         .drop-zone.dragging {
             border-color: var(--accent-cyan);
-            background: rgba(0, 255, 204, 0.1);
+            background: rgba(0, 255, 204, .1);
             transform: scale(1.02);
         }
-        
+
         .upload-icon {
             font-size: 4rem;
             margin-bottom: 20px;
             display: block;
-            filter: drop-shadow(0 0 20px rgba(0, 255, 204, 0.3));
+            filter: drop-shadow(0 0 20px rgba(0, 255, 204, .3));
         }
-        
+
         .drop-zone-text {
             font-size: 1.1rem;
             margin-bottom: 12px;
             color: var(--text-primary);
         }
-        
+
         .drop-zone-hint {
-            font-size: 0.85rem;
+            font-size: .85rem;
             color: var(--text-secondary);
         }
-        
-        input[type="file"] {
+
+        input[type=file] {
             display: none;
         }
-        
+
         .btn {
             font-family: 'Orbitron', sans-serif;
             font-weight: 700;
@@ -194,13 +213,13 @@
             border: none;
             cursor: pointer;
             font-size: 1rem;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all .3s cubic-bezier(.4, 0, .2, 1);
             text-transform: uppercase;
-            letter-spacing: 0.1em;
+            letter-spacing: .1em;
             position: relative;
             overflow: hidden;
         }
-        
+
         .btn::before {
             content: '';
             position: absolute;
@@ -209,33 +228,33 @@
             width: 0;
             height: 0;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, .2);
             transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
+            transition: width .6s, height .6s;
         }
-        
+
         .btn:hover::before {
             width: 300px;
             height: 300px;
         }
-        
+
         .btn-primary {
             background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
             color: var(--bg-primary);
-            box-shadow: 0 8px 24px rgba(0, 255, 204, 0.3);
+            box-shadow: 0 8px 24px rgba(0, 255, 204, .3);
         }
-        
+
         .btn-primary:hover {
-            box-shadow: 0 12px 32px rgba(0, 255, 204, 0.4);
+            box-shadow: 0 12px 32px rgba(0, 255, 204, .4);
             transform: translateY(-2px);
         }
-        
+
         .btn-primary:disabled {
-            opacity: 0.5;
+            opacity: .5;
             cursor: not-allowed;
             transform: none;
         }
-        
+
         .status-area {
             margin-top: 32px;
             padding: 24px;
@@ -243,548 +262,285 @@
             background: var(--bg-tertiary);
             border-left: 4px solid transparent;
             display: none;
-            animation: slideIn 0.4s ease;
+            animation: slideIn .4s ease;
         }
-        
+
         @keyframes slideIn {
             from {
                 opacity: 0;
                 transform: translateX(-20px);
             }
+
             to {
                 opacity: 1;
                 transform: translateX(0);
             }
         }
-        
+
         .status-area.visible {
             display: block;
         }
-        
+
         .status-area.success {
             border-left-color: var(--accent-cyan);
         }
-        
+
         .status-area.error {
             border-left-color: var(--accent-orange);
         }
-        
+
         .status-area.processing {
             border-left-color: var(--accent-purple);
         }
-        
+
         .file-info {
             margin-top: 24px;
             padding: 20px;
-            background: rgba(0, 255, 204, 0.05);
+            background: rgba(0, 255, 204, .05);
             border-radius: 12px;
-            border: 1px solid rgba(0, 255, 204, 0.2);
+            border: 1px solid rgba(0, 255, 204, .2);
         }
-        
+
         .file-info-item {
             display: flex;
             justify-content: space-between;
             padding: 8px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, .05);
         }
-        
+
         .file-info-item:last-child {
             border-bottom: none;
         }
-        
+
         .file-info-label {
             color: var(--text-secondary);
-            font-size: 0.85rem;
+            font-size: .85rem;
         }
-        
+
         .file-info-value {
             color: var(--accent-cyan);
             font-weight: 500;
         }
-        
+
         .progress-bar {
             width: 100%;
             height: 6px;
-            background: rgba(0, 255, 204, 0.1);
+            background: rgba(0, 255, 204, .1);
             border-radius: 3px;
             overflow: hidden;
             margin: 16px 0;
         }
-        
+
         .progress-fill {
             height: 100%;
             background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
             width: 0%;
-            transition: width 0.3s ease;
+            transition: width .3s ease;
             animation: pulse 1.5s ease-in-out infinite;
         }
-        
+
         @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: .7;
+            }
         }
-        
+
         footer {
             text-align: center;
             padding: 40px 24px;
             color: var(--text-secondary);
-            font-size: 0.85rem;
+            font-size: .85rem;
         }
-        
+
         footer a {
             color: var(--accent-cyan);
             text-decoration: none;
-            transition: color 0.3s ease;
+            transition: color .3s ease;
         }
-        
+
         footer a:hover {
             color: var(--accent-purple);
         }
-        
+
         .info-box {
-            background: rgba(255, 107, 53, 0.1);
-            border: 1px solid rgba(255, 107, 53, 0.3);
+            background: rgba(255, 107, 53, .1);
+            border: 1px solid rgba(255, 107, 53, .3);
             border-radius: 12px;
             padding: 20px;
             margin-top: 32px;
-            font-size: 0.9rem;
+            font-size: .9rem;
             line-height: 1.6;
         }
-        
+
         .info-box strong {
             color: var(--accent-orange);
         }
-        
-        @media (max-width: 768px) {
-            .converter-card {
-                padding: 32px 24px;
-            }
-            
-            .drop-zone {
-                padding: 40px 20px;
-            }
-        }
     </style>
 </head>
+
 <body>
     <div class="container">
         <header>
             <h1>Bloxd → Minecraft</h1>
-            <p class="subtitle">Convertisseur de Schematics</p>
+            <p class="subtitle">Schematic Converter</p>
         </header>
-        
+
         <div class="converter-card">
             <div class="drop-zone" id="dropZone">
                 <span class="upload-icon">📦</span>
-                <div class="drop-zone-text">Glissez votre fichier .bloxdschem ici</div>
-                <div class="drop-zone-hint">ou cliquez pour sélectionner</div>
+                <div class="drop-zone-text">Drag your .bloxdschem file here</div>
+                <div class="drop-zone-hint">or click to select</div>
                 <input type="file" id="fileInput" accept=".bloxdschem">
             </div>
-            
+
             <div class="status-area" id="statusArea">
                 <div id="statusMessage"></div>
-                <div class="progress-bar" id="progressBar" style="display: none;">
+                <div class="progress-bar" id="progressBar" style="display:none;">
                     <div class="progress-fill" id="progressFill"></div>
                 </div>
                 <div id="fileInfo"></div>
             </div>
-            
-            <div style="text-align: center; margin-top: 32px;">
+
+            <div style="text-align:center;margin-top:32px;">
                 <button class="btn btn-primary" id="convertBtn" disabled>
-                    <span style="position: relative; z-index: 1;">Convertir en .schem</span>
+                    <span style="position:relative;z-index:1;">Convert to .schem</span>
                 </button>
             </div>
-            
+
             <div class="info-box">
-                <strong>⚠️ Note importante :</strong> Ce convertisseur transforme les fichiers .bloxdschem en format .schem (Sponge Schematic) compatible avec Minecraft. Les blocs sans équivalent sont remplacés par de la terre.
+                <strong>⚠️ Important Note:</strong> This converter transforms .bloxdschem files into .schem (Sponge Schematic) format compatible with Minecraft. Blocks without equivalents are replaced with dirt.
             </div>
         </div>
-        
+
         <footer>
-            Créé avec ❤️ | Inspiré par <a href="https://hansdiewurst.github.io/converter/" target="_blank">le convertisseur original</a>
+            Made with ❤️ by Cazozozop and Martin_MMC | Inspired by <a href="hhttps://github.com/hansdiewurst/converter" target="_blank">hansdiewurst</a>
         </footer>
     </div>
 
     <script>
-        // Parser pour le format binaire Bloxd (Little-Endian)
+        // Binary Bloxd parser (Little-Endian)
         class BloxdReader {
             constructor(uint8Array) {
                 this.data = uint8Array;
                 this.offset = 0;
                 this.view = new DataView(uint8Array.buffer);
             }
-
             readInt32() {
-                const val = this.view.getInt32(this.offset, true); // true = little-endian
+                const v = this.view.getInt32(this.offset, true);
                 this.offset += 4;
-                return val;
+                return v;
             }
-
             readUInt32() {
-                const val = this.view.getUint32(this.offset, true);
+                const v = this.view.getUint32(this.offset, true);
                 this.offset += 4;
-                return val;
+                return v;
             }
-
             readUInt16() {
-                const val = this.view.getUint16(this.offset, true);
+                const v = this.view.getUint16(this.offset, true);
                 this.offset += 2;
-                return val;
+                return v;
             }
-
             readByte() {
                 return this.data[this.offset++];
             }
-
             readString() {
-                const length = this.readInt32();
-                const bytes = this.data.slice(this.offset, this.offset + length);
-                this.offset += length;
+                const len = this.readInt32();
+                const bytes = this.data.slice(this.offset, this.offset + len);
+                this.offset += len;
                 return new TextDecoder('utf-8').decode(bytes);
             }
-
             parse() {
                 const schematic = {};
-                
-                // Lire le nom
                 schematic.name = this.readString();
-                console.log('Nom:', schematic.name);
-                
-                // Lire les dimensions (probablement 3 uint16 ou int32)
+                console.log('Name:', schematic.name);
                 schematic.width = this.readUInt16();
                 schematic.height = this.readUInt16();
                 schematic.length = this.readUInt16();
                 console.log('Dimensions:', schematic.width, 'x', schematic.height, 'x', schematic.length);
-                
-                // Lire le nombre de blocs dans la palette
                 const paletteSize = this.readUInt16();
-                console.log('Taille palette:', paletteSize);
-                
-                // Lire la palette
+                console.log('Palette size:', paletteSize);
                 schematic.palette = {};
                 for (let i = 0; i < paletteSize; i++) {
                     const blockName = this.readString();
                     schematic.palette[i] = blockName;
                     console.log(`Palette[${i}] =`, blockName);
                 }
-                
-                // Lire les données de blocs
                 const totalBlocks = schematic.width * schematic.height * schematic.length;
                 schematic.blockData = [];
-                
                 for (let i = 0; i < totalBlocks; i++) {
-                    const blockIndex = this.readUInt16();
-                    schematic.blockData.push(blockIndex);
+                    schematic.blockData.push(this.readUInt16());
                 }
-                
-                console.log('Blocs lus:', schematic.blockData.length);
-                
+                console.log('Blocks read:', schematic.blockData.length);
                 return schematic;
             }
         }
 
-        // Écrivain NBT pour Minecraft (Big-Endian)
-        class NBTWriter {
-            constructor() {
-                this.buffer = [];
-            }
-
-            writeByte(val) {
-                this.buffer.push(val & 0xFF);
-            }
-
-            writeShort(val) {
-                this.buffer.push((val >> 8) & 0xFF);
-                this.buffer.push(val & 0xFF);
-            }
-
-            writeInt(val) {
-                this.buffer.push((val >> 24) & 0xFF);
-                this.buffer.push((val >> 16) & 0xFF);
-                this.buffer.push((val >> 8) & 0xFF);
-                this.buffer.push(val & 0xFF);
-            }
-
-            writeString(str) {
-                const bytes = new TextEncoder().encode(str);
-                this.writeShort(bytes.length);
-                for (const byte of bytes) {
-                    this.buffer.push(byte);
-                }
-            }
-
-            writeByteArray(arr) {
-                this.writeInt(arr.length);
-                for (const val of arr) {
-                    this.writeByte(val);
-                }
-            }
-
-            writeCompound(obj) {
-                for (const [key, value] of Object.entries(obj)) {
-                    if (value === null || value === undefined) continue;
-                    
-                    if (typeof value === 'number' && Number.isInteger(value)) {
-                        if (value >= -128 && value <= 127) {
-                            this.writeByte(1);
-                            this.writeString(key);
-                            this.writeByte(value);
-                        } else if (value >= -32768 && value <= 32767) {
-                            this.writeByte(2);
-                            this.writeString(key);
-                            this.writeShort(value);
-                        } else {
-                            this.writeByte(3);
-                            this.writeString(key);
-                            this.writeInt(value);
-                        }
-                    } else if (typeof value === 'string') {
-                        this.writeByte(8);
-                        this.writeString(key);
-                        this.writeString(value);
-                    } else if (Array.isArray(value)) {
-                        this.writeByte(7);
-                        this.writeString(key);
-                        this.writeByteArray(value);
-                    } else if (typeof value === 'object') {
-                        this.writeByte(10);
-                        this.writeString(key);
-                        this.writeCompound(value);
-                    }
-                }
-                this.writeByte(0);
-            }
-
-            write(data, name = '') {
-                this.writeByte(10);
-                this.writeString(name);
-                this.writeCompound(data);
-                return new Uint8Array(this.buffer);
-            }
-        }
-
-        // Mapping des blocs
-        const blockMapping = {
-            'air': 'minecraft:air',
-            'stone': 'minecraft:stone',
-            'grass_block': 'minecraft:grass_block',
-            'grass': 'minecraft:grass_block',
-            'dirt': 'minecraft:dirt',
-            'cobblestone': 'minecraft:cobblestone',
-            'planks': 'minecraft:oak_planks',
-            'oak_planks': 'minecraft:oak_planks',
-            'wood': 'minecraft:oak_log',
-            'log': 'minecraft:oak_log',
-            'oak_log': 'minecraft:oak_log',
-            'bedrock': 'minecraft:bedrock',
-            'water': 'minecraft:water',
-            'lava': 'minecraft:lava',
-            'sand': 'minecraft:sand',
-            'gravel': 'minecraft:gravel',
-            'gold_ore': 'minecraft:gold_ore',
-            'iron_ore': 'minecraft:iron_ore',
-            'coal_ore': 'minecraft:coal_ore',
-            'leaves': 'minecraft:oak_leaves',
-            'oak_leaves': 'minecraft:oak_leaves',
-            'glass': 'minecraft:glass',
-            'wool': 'minecraft:white_wool',
-            'white_wool': 'minecraft:white_wool',
-            'brick': 'minecraft:bricks',
-            'bricks': 'minecraft:bricks',
-            'tnt': 'minecraft:tnt',
-            'bookshelf': 'minecraft:bookshelf',
-            'obsidian': 'minecraft:obsidian',
-            'diamond_ore': 'minecraft:diamond_ore',
-            'ice': 'minecraft:ice',
-            'snow': 'minecraft:snow_block',
-            'snow_block': 'minecraft:snow_block',
-            'clay': 'minecraft:clay',
-            'fence': 'minecraft:oak_fence',
-            'oak_fence': 'minecraft:oak_fence',
-            'glowstone': 'minecraft:glowstone'
-        };
-
-        const dropZone = document.getElementById('dropZone');
-        const fileInput = document.getElementById('fileInput');
-        const convertBtn = document.getElementById('convertBtn');
-        const statusArea = document.getElementById('statusArea');
-        const statusMessage = document.getElementById('statusMessage');
-        const progressBar = document.getElementById('progressBar');
-        const progressFill = document.getElementById('progressFill');
-        const fileInfo = document.getElementById('fileInfo');
-        
-        let currentFile = null;
-
-        dropZone.addEventListener('click', () => fileInput.click());
-        
-        dropZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            dropZone.classList.add('dragging');
-        });
-        
-        dropZone.addEventListener('dragleave', () => {
-            dropZone.classList.remove('dragging');
-        });
-        
-        dropZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            dropZone.classList.remove('dragging');
-            const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                handleFile(files[0]);
-            }
-        });
-        
-        fileInput.addEventListener('change', (e) => {
-            if (e.target.files.length > 0) {
-                handleFile(e.target.files[0]);
-            }
-        });
-        
         function handleFile(file) {
             if (!file.name.endsWith('.bloxdschem')) {
-                showStatus('error', '❌ Veuillez sélectionner un fichier .bloxdschem');
+                showStatus('error', '❌ Please select a .bloxdschem file');
                 return;
             }
-            
             currentFile = file;
             convertBtn.disabled = false;
-            
-            showStatus('success', `✅ Fichier chargé: ${file.name}`);
-            
+            showStatus('success', `✅ File loaded: ${file.name}`);
             fileInfo.innerHTML = `
-                <div class="file-info">
-                    <div class="file-info-item">
-                        <span class="file-info-label">Nom du fichier</span>
-                        <span class="file-info-value">${file.name}</span>
-                    </div>
-                    <div class="file-info-item">
-                        <span class="file-info-label">Taille</span>
-                        <span class="file-info-value">${(file.size / 1024).toFixed(2)} KB</span>
-                    </div>
-                </div>
-            `;
+<div class="file-info">
+<div class="file-info-item"><span class="file-info-label">File name</span><span class="file-info-value">${file.name}</span></div>
+<div class="file-info-item"><span class="file-info-label">Size</span><span class="file-info-value">${(file.size/1024).toFixed(2)} KB</span></div>
+</div>`;
         }
-        
+
         function showStatus(type, message) {
             statusArea.className = 'status-area visible ' + type;
             statusMessage.innerHTML = message;
         }
-        
+
         convertBtn.addEventListener('click', async () => {
             if (!currentFile) return;
-            
             convertBtn.disabled = true;
-            showStatus('processing', '🔄 Conversion en cours...');
+            showStatus('processing', '🔄 Converting...');
             progressBar.style.display = 'block';
             progressFill.style.width = '30%';
-            
+
             try {
                 const arrayBuffer = await currentFile.arrayBuffer();
                 const uint8Array = new Uint8Array(arrayBuffer);
-                
                 progressFill.style.width = '40%';
-                
-                // Parser le format Bloxd
                 const reader = new BloxdReader(uint8Array);
                 const bloxdData = reader.parse();
-                
                 progressFill.style.width = '60%';
-                
-                // Convertir en format Minecraft
                 const minecraftSchem = convertToMinecraft(bloxdData);
-                
                 progressFill.style.width = '80%';
-                
-                // Créer le fichier .schem
                 const schemData = createSchemFile(minecraftSchem);
-                
-                // Télécharger
-                const blob = new Blob([schemData], { type: 'application/octet-stream' });
+                const blob = new Blob([schemData], {
+                    type: 'application/octet-stream'
+                });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
                 a.download = currentFile.name.replace('.bloxdschem', '.schem');
                 a.click();
                 URL.revokeObjectURL(url);
-                
                 progressFill.style.width = '100%';
-                
                 setTimeout(() => {
-                    showStatus('success', `✅ Conversion réussie! Dimensions: ${minecraftSchem.Width}x${minecraftSchem.Height}x${minecraftSchem.Length}`);
+                    showStatus('success', `✅ Conversion successful! Dimensions: ${minecraftSchem.Width}x${minecraftSchem.Height}x${minecraftSchem.Length}`);
                     progressBar.style.display = 'none';
                     convertBtn.disabled = false;
                 }, 500);
-                
             } catch (error) {
-                console.error('Erreur de conversion:', error);
-                showStatus('error', '❌ Erreur lors de la conversion: ' + error.message);
+                console.error('Conversion error:', error);
+                showStatus('error', '❌ Error during conversion: ' + error.message);
                 progressBar.style.display = 'none';
                 convertBtn.disabled = false;
             }
         });
-        
-        function convertToMinecraft(bloxdData) {
-            const palette = {};
-            const blockData = [];
-            let paletteMax = 0;
-            
-            // Convertir les blocs
-            for (let i = 0; i < bloxdData.blockData.length; i++) {
-                const blockIndex = bloxdData.blockData[i];
-                let bloxdBlockName = bloxdData.palette[blockIndex] || 'air';
-                
-                // Nettoyer le nom du bloc
-                bloxdBlockName = bloxdBlockName.toLowerCase()
-                    .replace(/^minecraft:/, '')
-                    .replace(/^bloxd:/, '')
-                    .replace(/[^a-z_]/g, '_');
-                
-                // Convertir vers Minecraft
-                let minecraftBlock = blockMapping[bloxdBlockName] || 'minecraft:dirt';
-                
-                // Ajouter à la palette si nouveau
-                if (!(minecraftBlock in palette)) {
-                    palette[minecraftBlock] = paletteMax++;
-                }
-                
-                blockData.push(palette[minecraftBlock]);
-            }
-            
-            return {
-                Version: 2,
-                DataVersion: 2730,
-                Width: bloxdData.width,
-                Height: bloxdData.height,
-                Length: bloxdData.length,
-                Palette: palette,
-                PaletteMax: paletteMax,
-                BlockData: blockData
-            };
-        }
-        
-        function createSchemFile(schem) {
-            const paletteObj = {};
-            for (const [block, index] of Object.entries(schem.Palette)) {
-                paletteObj[block] = index;
-            }
-            
-            const nbtData = {
-                Version: schem.Version,
-                DataVersion: schem.DataVersion,
-                Width: schem.Width,
-                Height: schem.Height,
-                Length: schem.Length,
-                PaletteMax: schem.PaletteMax,
-                Palette: paletteObj,
-                BlockData: schem.BlockData
-            };
-            
-            const writer = new NBTWriter();
-            const nbtBytes = writer.write(nbtData, 'Schematic');
-            
-            return pako.gzip(nbtBytes);
-        }
     </script>
 </body>
+
 </html>
